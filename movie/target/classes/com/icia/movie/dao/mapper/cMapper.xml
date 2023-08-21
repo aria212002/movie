@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="COMMENT">
+
+	<!-- 댓글 목록 -->
+	<select resultType="comment" parameterType="int" id="cmList"> SELECT *
+		FROM COSCOMMENT WHERE CMBNUM = #{cmbNum} ORDER BY CMNUM DESC </select>
+
+	<!-- 댓글 입력 -->
+	<insert parameterType="comment" id="cmWrite"> INSERT INTO COSCOMMENT
+		VALUES(CMNUM_SEQ.NEXTVAL, #{cmbNum}, #{cmWriter},#{cmContent},
+		SYSDATE) </insert>
+
+	<!-- 댓글 수정 -->
+	<update parameterType="comment" id="cmModify"> UPDATE COSCOMMENT SET
+		CMCONTENT = #{cmContent} WHERE CMNUM = #{cmNum} </update>
+
+	<!-- 댓글 삭제 -->
+	<delete parameterType="comment" id="cmDelete">DELETE FROM COSCOMMENT WHERE
+		CMNUM = #{cmNum} </delete>
+
+</mapper>

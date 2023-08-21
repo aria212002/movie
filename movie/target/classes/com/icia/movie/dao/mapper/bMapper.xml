@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Board">
+	<!-- 게시글 작성 -->
+	<insert id="bdWrite" parameterType="board"> 
+		INSERT INTO MBOARD VALUES(MBOARD_SEQ.NEXTVAL, #{bdWriter}, #{bdTitle}, 
+		#{bdContent}, SYSDATE) 
+	</insert>
+	
+	<!-- 전체 게시글 갯수 -->
+	<select id="bdCount" resultType="int">
+		SELECT COUNT(*) FROM MBOARD
+	</select>
+	
+	<!-- 게시글 목록 -->
+	<select id="bdList" parameterType="paging" resultType="board">
+		SELECT * FROM MVBLIST WHERE RN BETWEEN #{startRow} AND #{endRow}
+	</select>
+	
+	<!-- 게시글 보기 -->
+	<select id="bdView" parameterType="int" resultType="board">
+		SELECT * FROM MBOARD WHERE BDNUM = #{bdNum}
+	</select>
+	
+	<!-- 게시글 수정 -->
+	<update id="bdModify" parameterType="board">
+		UPDATE MBOARD SET BDTITLE = #{bdTitle}, BDCONTENT = #{bdContent} 
+		WHERE BDNUM = #{bdNum}
+	</update>
+	
+	<!-- 게시글 삭제 -->
+	<delete id="bdDelete" parameterType="int">
+		DELETE FROM MBOARD WHERE BDNUM = #{bdNum}
+	</delete>
+</mapper>

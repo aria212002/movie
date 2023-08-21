@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ticketing">
+	<select id="seatCheck" resultType="int" parameterType="int">
+		SELECT sum(MTCOUNT) FROM MTICKETING WHERE MTSNUMBER=#{mtsNumber}
+	</select>
+	<select id="maxMtNumber" resultType="int">
+		SELECT max(mtNumber) FROM MTICKETING
+	</select>
+		<select id="reservedSeat" resultType="String" parameterType="int">
+		SELECT MTSEAT FROM MTICKETING WHERE MTSNUMBER=#{mtsNumber}
+	</select>
+		<select id="callId" parameterType="int" resultType="String">
+		SELECT MTID FROM MTICKETING WHERE MTNUMBER = #{mtNumber}
+	</select>
+
+	<insert id="reserve" parameterType="ticketing">
+		INSERT INTO MTICKETING values(#{mtNumber},#{mtsNumber},#{mtName},#{mtSeat},#{mtCount},#{mtPrice},0,#{mtId})
+	</insert>
+	
+	<delete id="reserveDel" parameterType="int">
+		DELETE FROM MTICKETING WHERE MTNUMBER = #{mtNumber}
+	</delete>
+	<delete id="successPay" parameterType="int">
+		UPDATE MTICKETING SET MTPAYMENT=1 WHERE MTNUMBER = #{mtNumber}
+	</delete>
+	
+	<!-- 내 예매내역 확인 -->
+	<select id="ticketingList" parameterType="String" resultType="ticketing">
+		SELECT * FROM MTICKETING, MSCHEDULE, MINFO  WHERE MTSNUMBER = MSNUMBER AND MINAME = MSNAME AND MTID = #{mbId}
+	</select>
+	
+	<!-- 전체 예매 내역 갯수 -->
+	<select resultType="int" id="adtCount">
+		SELECT COUNT(*) FROM MTICKETING 
+	</select>
+
+	<!-- 관리자탭 예매 내역 -->
+	<select resultType="ticketing" id="adminTicketList">
+		SELECT * FROM ADTICKETING WHERE RN BETWEEN #{startRow} AND #{endRow}
+	</select>
+
+	<!-- 예약 관리 검색 -->
+	<select parameterType="search" resultType="ticketing" id="adtSearch">
+		SELECT * FROM MTICKETING WHERE ${category} LIKE '%${keyword}%' 
+	</select>
+	
+	<delete id="reserveDel2" parameterType="int">
+		DELETE FROM MTICKETING WHERE MTNUMBER = #{mtNumber}
+	</delete>
+	
+	<delete id="reserveDel3" parameterType="int">
+		DELETE FROM MTICKETING WHERE MTNUMBER = #{mtNumber}
+	</delete>
+	
+</mapper>

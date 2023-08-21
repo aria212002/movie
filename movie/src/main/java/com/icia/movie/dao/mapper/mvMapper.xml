@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Movie">
+
+	<!-- 리뷰 작성 여부 확인 -->
+	<select id="mrIdCheck" parameterType="review" resultType="int">
+		SELECT COUNT(MRREVIEW) FROM MREVIEW WHERE MRID = #{mrId} AND MRNAME = #{mrName}
+	</select>
+
+
+	<!-- 장르 검색 -->
+	<select id="mvSearch" parameterType="search" resultType="info">
+		SELECT * FROM MINFO WHERE (MIGENRE1 || MIGENRE2 || MIGENRE3) LIKE '%${keyword}%' ORDER BY MIRELEASE DESC
+	</select>
+
+	<!-- rvDelete : 리뷰 삭제 -->
+	<delete id="rvDelete" parameterType="review">
+		DELETE FROM MREVIEW WHERE MRID = #{mrId} AND MRNAME=#{mrName}
+	</delete>
+	
+	<!-- rvModify : 리뷰 수정 -->
+	<update id="rvModify" parameterType="review">
+		UPDATE MREVIEW SET MRNAME = #{mrName},  MRREVIEW = #{mrReview}, MRDATE = SYSDATE,  MRID = #{mrId}  WHERE MRID = #{mrId} AND MRNAME=#{mrName}
+	</update>
+
+	<!-- rvWrite : 리뷰 작성 -->
+	<insert id="rvWrite" parameterType="review">
+		INSERT INTO MREVIEW
+		VALUES(#{mrName}, #{mrReview}, #{mrId}, SYSDATE)
+	</insert>
+
+	<!-- cList : 리뷰 리스트 -->
+	<select id="cList" parameterType="String" resultType="review">
+		SELECT
+		TO_CHAR(MRDATE, 'YYYY-MM-DD') AS MRDATE, MRREVIEW, MRID
+		FROM MREVIEW
+		WHERE MRNAME=#{mrName}
+	</select>
+	
+	<select id="bCount" resultType="int">
+		SELECT COUNT(*) FROM MREVIEW
+	</select>
+
+
+	<!-- movieChart : 영화 페이지 이동 -->
+	<select id="movieChart" resultType="info">SELECT * FROM MINFO ORDER BY MIRELEASE DESC </select>
+
+	<!-- 영화 정보 작성 -->
+	<insert parameterType="info" id="mvWrite">INSERT INTO MINFO VALUES(
+		#{miName}, #{miGenre1}, #{miGenre2}, #{miGenre3}, #{miDirecter},
+		#{miActor}, #{miSynopsis},#{miAge}, #{miRuntime}, #{miPoster},
+		#{miRelease}, #{miTeaser}, #{miStillcut1},
+		#{miStillcut2},#{miStillcut3}, #{miStillcut4}, #{miStillcut5},
+		#{miStillcut6} )
+	</insert>
+
+	<!-- 영화 리스트 -->
+	<select id="mvList" resultType="info">SELECT * FROM MINFO </select>
+
+	<!-- 영화 정보 상세보기 -->
+	<select parameterType="String" id="mvDetail" resultType="info">SELECT
+		*
+		FROM MINFO WHERE MINAME = #{miName}
+	</select>
+
+	<!-- 영화 정보 수정 -->
+	<update parameterType="info" id="mvModify">UPDATE MINFO SET MIGENRE1 =
+		#{miGenre1},MIGENRE2 = #{miGenre2},MIGENRE3 = #{miGenre3}, MIDIRECTER
+		= #{miDirecter},MIACTOR = #{miActor},MISYNOPSIS = #{miSynopsis},
+		MIAGE
+		= #{miAge}, MIRUNTIME = #{miRuntime},MIPOSTER = #{miPoster}, MIRELEASE
+		= #{miRelease}, MITEASER = #{miTeaser}, MISTILLCUT1 =
+		#{miStillcut1},MISTILLCUT2 = #{miStillcut2}, MISTILLCUT3 =
+		#{miStillcut3}, MISTILLCUT4 = #{miStillcut4},MISTILLCUT5 =
+		#{miStillcut5}, MISTILLCUT6 = #{miStillcut6} WHERE MINAME = #{miName}
+	</update>
+
+	<!-- 영화 정보 삭제 -->
+	<delete parameterType="String" id="mvDelete">
+	DELETE FROM MINFO WHERE MINAME = #{miName}
+	</delete>
+
+	<!-- 상영관 작성 -->
+	<insert parameterType="schedule" id="tWrite">INSERT INTO MTHEATER VALUES
+		( #{mtTheater}, #{mtKind}, #{mtSeats}, #{mtCommon}, #{mtChild} )
+	</insert>
+
+	<!-- 상영관 리스트 -->
+	<select id="tList" resultType="schedule">SELECT * FROM MTHEATER ORDER BY MTTHEATER ASC </select>
+
+	<!-- 상영관 상세보기 -->
+	<select parameterType="String" id="tDetail"
+		resultType="schedule">SELECT * FROM MTHEATER WHERE MTTHEATER = #{mtTheater}
+	</select>
+
+	<!-- 상영관 수정 -->
+	<update parameterType="schedule" id="tModify">UPDATE MTHEATER SET
+		MTTHEATER = #{mtTheater}, MTKIND = #{mtKind}, MTSEATS =
+		#{mtSeats},MTCOMMON = #{mtCommon}, MTCHILD = #{mtChild} WHERE
+		MTTHEATER = #{mtTheater}
+	</update>
+
+	<!-- 상영관 삭제 -->
+	<delete parameterType="String" id="tDelete">DELETE FROM MTHEATER WHERE
+		MTTHEATER = #{mtTheater}
+	</delete>
+
+	<!-- 스케쥴 작성 -->
+	<insert parameterType="schedule" id="sWrite">
+		INSERT INTO MSCHEDULE (MSNUMBER, MSNAME, MSSTARTTIME, MSENDTIME, MSDATE, MSTHEATER)
+		VALUES (SCHEDULE_SEQ.NEXTVAL, #{msName}, #{msStartTime},
+		TO_CHAR(TO_DATE(#{msStartTime}, 'HH24:MI') + (SELECT MIRUNTIME FROM MINFO WHERE MINAME=#{msName})/60/24 + 10/1440, 'HH24:MI'),
+		#{msDate}, #{msTheater})
+	</insert>
+
+	<!-- 스케쥴 상세보기 -->
+	<select parameterType="int" id="sView" resultType="schedule">SELECT *
+		FROM MSCHEDULE WHERE MSNUMBER = #{msNumber}
+	</select>
+
+	<!-- 스케쥴 번호로 상세보기 검색 -->
+	<select parameterType="int" id="snView" resultType="schedule">SELECT *
+		FROM
+		MSCHEDULE WHERE MSNUMBER = #{msNumber}
+	</select>
+
+	<!-- 스케쥴 수정 -->
+	<update parameterType="schedule" id="sModify">UPDATE MSCHEDULE SET MSNAME
+		= #{msName}, MSSTARTTIME = #{msStartTime}, MSENDTIME =
+		TO_CHAR(TO_DATE(#{msStartTime}, 'HH24:MI') + (SELECT MIRUNTIME FROM MINFO WHERE MINAME=#{msName})/60/24 + 10/1440, 'HH24:MI'), MSDATE = #{msDate}, MSTHEATER = #{msTheater} WHERE
+		MSNUMBER = #{msNumber}
+	</update>
+
+	<!-- 스케쥴 삭제 -->
+	<delete parameterType="int" id="sDelete">DELETE FROM MSCHEDULE WHERE
+		MSNUMBER = #{msNumber} 
+	</delete>
+
+<!-- 스케쥴 리스트 -->
+	<select parameterType="String" id="sList" resultType="schedule">SELECT *
+		FROM MSCHEDULE WHERE MSNAME = #{miName} ORDER BY MSNUMBER ASC
+	</select>
+	
+	<!-- 스케쥴 리스트 상영관 이름으로 -->
+	<select parameterType="String" id="sList2" resultType="schedule">SELECT *
+		FROM MSCHEDULE WHERE MSTHEATER = #{mtTheater} ORDER BY MSNUMBER ASC
+	</select>
+
+</mapper>
